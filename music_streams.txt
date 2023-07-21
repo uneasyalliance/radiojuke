@@ -1,1 +1,5 @@
-https://ice-1.streamhoster.com/lv_wqed--893
+WQED-FM,https://ice-1.streamhoster.com/lv_wqed--893
+Pittsburgh Symphony,https://ice-1.streamhoster.com/lv_wqed--concert
+More Local Music,https://ice-1.streamhoster.com/lv_wqed--qthemusic
+
+
