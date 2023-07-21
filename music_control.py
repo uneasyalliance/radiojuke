@@ -17,6 +17,9 @@ cur_stream_file = "current_stream.txt"
 stale_cur_stream_time_s = 3600
 
 application_path = Path( os.path.abspath(__file__) ).parent.resolve()
+
+# magnification values
+magnified = True
 medium_font_increase = 15
 large_font_increase = 30
 
@@ -90,16 +93,22 @@ class StreamUI:
 
     def create(self):
         default_font = tkinter.font.Font(font='TkDefaultFont')
-        large_font = medium_font = default_font
-        medium_font['size'] += medium_font_increase
-        large_font['size'] += large_font_increase
+        if magnified:
+            large_font = medium_font = default_font
+            medium_font['size'] += medium_font_increase
+            large_font['size'] += large_font_increase
+            default_pady = 10
+        else:
+            large_font = default_font
+            medium_font = default_font
+            default_pady = 1
 
         stream = self.selector.get_cur_stream()
         self._stream_var.set(stream.index)
         self._stream_var.trace('w', self._stream_changed)
         for stream in self.selector.streams:
             btn = tk.Radiobutton(self.master, text=stream.name, variable=self._stream_var, value=stream.index, font=large_font)
-            btn.pack(anchor='w', padx=30, pady=10)
+            btn.pack(anchor='w', padx=30, pady=default_pady)
 
     def _stream_changed(self, *_):
         self.selector.change_cur_stream(self._stream_var.get())
