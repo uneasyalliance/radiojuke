@@ -1,5 +1,10 @@
-WQED-FM,https://ice-1.streamhoster.com/lv_wqed--893
-Pittsburgh Symphony,https://ice-1.streamhoster.com/lv_wqed--concert
-More Local Music,https://ice-1.streamhoster.com/lv_wqed--qthemusic
+# Data format here is: DisplayName, URL (one pair per line)
+# see music_control.py
+# each stream show up in the GUI to be selectable
+# current_stream.txt holds the current selection
+# <-- this is a comment, stream lines may also be commented out
+WQED-FM, https://ice-1.streamhoster.com/lv_wqed--893
+Pittsburgh Symphony, https://ice-1.streamhoster.com/lv_wqed--concert
+More Local Music, https://ice-1.streamhoster.com/lv_wqed--qthemusic
 
 
