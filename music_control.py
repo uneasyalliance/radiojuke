@@ -21,7 +21,7 @@ application_path = Path( os.path.abspath(__file__) ).parent.resolve()
 
 # magnification values
 magnified = True
-external_player = False
+external_player = True
 medium_font_increase = 15
 large_font_increase = 30
 
@@ -48,7 +48,7 @@ class StreamSelector:
                     try:
                         (name, url) = line.split(",")
                     except ValueError:
-                        continue
+                        continue # TODO error, log
                     self.streams.append(Stream(index=index, name=name, url=url))
                     index += 1
 
@@ -95,27 +95,28 @@ class StreamUI:
         master.title("Music Player")
         master.resizable(False, False)
 
-        large_font = tkinter.font.Font(font='TkDefaultFont')
-        medium_font = tkinter.font.Font(font='TkDefaultFont')
+        FONT_LRG = tkinter.font.Font(font='TkDefaultFont')
+        FONT_MED = tkinter.font.Font(font='TkDefaultFont')
         if magnified:
-            medium_font['size'] += medium_font_increase
-            large_font['size'] += large_font_increase
-            default_pady = 10
+            FONT_MED['size'] += medium_font_increase
+            FONT_LRG['size'] += large_font_increase
+            PADY = 10
         else:
-            default_pady = 1
+            PADY = 1
+        PADX = 30
 
         self.radio_btns = []
         stream = self.selector.get_cur_stream(initializing=True)
         self._stream_var.set(stream.index)
         self._stream_var.trace('w', self._stream_changed)
         for stream in self.selector.streams:
-            btn = tk.Radiobutton(self.master, text=stream.name, variable=self._stream_var, value=stream.index, font=large_font)
-            btn.pack(anchor='w', padx=30, pady=default_pady)
+            btn = tk.Radiobutton(self.master, text=stream.name, variable=self._stream_var, value=stream.index, font=FONT_LRG)
+            btn.pack(anchor='w', padx=PADX, pady=PADY)
             self.radio_btns.append(btn)
 
         if not external_player:
-            self.play_stop_btn = tk.Button(self.master, text="Play", font=medium_font, command=self._play_stop)
-            self.play_stop_btn.pack()
+            self.play_stop_btn = tk.Button(self.master, text="Play", font=FONT_MED, command=self._play_stop)
+            self.play_stop_btn.pack(pady=PADY)
 
     def _stream_changed(self, *_):
         self.selector.change_cur_stream(self._stream_var.get())
