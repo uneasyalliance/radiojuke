@@ -3,6 +3,7 @@ import tkinter as tk
 import tkinter.font
 from pathlib import Path
 from time import time
+#import vlc
 
 
 # default stream selection:
@@ -20,6 +21,7 @@ application_path = Path( os.path.abspath(__file__) ).parent.resolve()
 
 # magnification values
 magnified = True
+external_player = False
 medium_font_increase = 15
 large_font_increase = 30
 
@@ -36,6 +38,7 @@ class StreamSelector:
         self._i_current_stream = 0
         self._stream_name_file = path / stream_name_file
         self._cur_stream_file = path / cur_stream_file
+        self.read_streams()
 
     def read_streams(self):
         with open(self._stream_name_file, 'r', encoding="utf-8") as f:
@@ -69,13 +72,14 @@ class StreamSelector:
             self._i_current_stream = 0
             print(ex) # TODO log
 
-    def get_cur_stream(self):
-        if os.path.exists(self._cur_stream_file):
-            if time() - os.path.getmtime(self._cur_stream_file) > stale_cur_stream_time_s:
-                # old stream selection, default to first stream
-                self.change_cur_stream(0)
-            else:
-                self._read_cur_stream_idx()
+    def get_cur_stream(self, initializing=False):
+        if initializing:
+            if os.path.exists(self._cur_stream_file):
+                if time() - os.path.getmtime(self._cur_stream_file) > stale_cur_stream_time_s:
+                    # old stream selection, default to first stream
+                    self.change_cur_stream(0)
+                else:
+                    self._read_cur_stream_idx()
                     
         return self.streams[self._i_current_stream]
                     
@@ -91,37 +95,47 @@ class StreamUI:
         master.title("Music Player")
         master.resizable(False, False)
 
-    def create(self):
-        default_font = tkinter.font.Font(font='TkDefaultFont')
+        large_font = tkinter.font.Font(font='TkDefaultFont')
+        medium_font = tkinter.font.Font(font='TkDefaultFont')
         if magnified:
-            large_font = medium_font = default_font
             medium_font['size'] += medium_font_increase
             large_font['size'] += large_font_increase
             default_pady = 10
         else:
-            large_font = default_font
-            medium_font = default_font
             default_pady = 1
 
-        stream = self.selector.get_cur_stream()
+        self.radio_btns = []
+        stream = self.selector.get_cur_stream(initializing=True)
         self._stream_var.set(stream.index)
         self._stream_var.trace('w', self._stream_changed)
         for stream in self.selector.streams:
             btn = tk.Radiobutton(self.master, text=stream.name, variable=self._stream_var, value=stream.index, font=large_font)
             btn.pack(anchor='w', padx=30, pady=default_pady)
+            self.radio_btns.append(btn)
+
+        if not external_player:
+            self.play_stop_btn = tk.Button(self.master, text="Play", font=medium_font, command=self._play_stop)
+            self.play_stop_btn.pack()
 
     def _stream_changed(self, *_):
         self.selector.change_cur_stream(self._stream_var.get())
 
+    def _play_stop(self):
+        text = self.play_stop_btn['text']
+        url = self.selector.get_cur_stream().url
+        print(text, url)
+        if text == 'Play':
+            text = 'Stop'
+        else:
+            text = 'Play'
+        self.play_stop_btn['text'] = text
+
 
 def main():            
     selector = StreamSelector(application_path)
-    selector.read_streams()
-
     root = tk.Tk()
+    StreamUI(master=root, selector=selector)
 
-    ui = StreamUI(master=root, selector=selector)
-    ui.create()
     root.mainloop()
 
 
