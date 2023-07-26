@@ -98,6 +98,7 @@ class StreamUI:
         FONT_LRG = tkinter.font.Font(font='TkDefaultFont')
         FONT_MED = tkinter.font.Font(font='TkDefaultFont')
         if magnified:
+            master['bg'] = "black"
             FONT_MED['size'] += medium_font_increase
             FONT_LRG['size'] += large_font_increase
             PADY = 10
@@ -111,6 +112,10 @@ class StreamUI:
         self._stream_var.trace('w', self._stream_changed)
         for stream in self.selector.streams:
             btn = tk.Radiobutton(self.master, text=stream.name, variable=self._stream_var, value=stream.index, font=FONT_LRG)
+            if magnified:
+                btn['indicatoron'] = 0
+                btn['background'] = 'gray'
+                btn['selectcolor'] = 'red'
             btn.pack(anchor='w', padx=PADX, pady=PADY)
             self.radio_btns.append(btn)
 
@@ -118,8 +123,9 @@ class StreamUI:
             self.play_stop_btn = tk.Button(self.master, text="Play", font=FONT_MED, command=self._play_stop)
             self.play_stop_btn.pack(pady=PADY)
 
-    def _stream_changed(self, *_):
-        self.selector.change_cur_stream(self._stream_var.get())
+    def _stream_changed(self, *arg):
+        i_selection = self._stream_var.get()
+        self.selector.change_cur_stream(i_selection)
 
     def _play_stop(self):
         text = self.play_stop_btn['text']
